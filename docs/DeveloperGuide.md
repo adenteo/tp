@@ -24,7 +24,7 @@ Some of its core features include:
 
 Here's a class diagram that shows the core structure of the `Parser` class.
 
-![ParserClassDiagram](../../ParserClassDiagram.png)
+![ParserClassDiagram](/static/ParserClassDiagram.png)
 
 How `Parser` works:
 
@@ -43,7 +43,7 @@ How `Parser` works:
 The Sequence Diagram below illustrates the interactions within the `Parser` component when a user inputs the following
 command: `/add McDonalds -c Food -p 10.50`
 
-![ParserSequenceDiagram](../../ParserSequenceDiagram.png)
+![ParserSequenceDiagram](/static/ParserSequenceDiagram.png)
 
 ## Product scope
 
