@@ -46,14 +46,18 @@ public final class MessageConstants {
     public static final String MESSAGE_EMPTY_INPUT = "Use /help for a list of supported commands!";
     public static final String MESSAGE_INVALID_COMMAND = "Please enter a valid command!";
     public static final String MESSAGE_INVALID_CATEGORY = "Please specify a valid category!";
-    public static final String MESSAGE_INVALID_DESCRIPTION = "Description can only contain letters and numbers!";
+    public static final String MESSAGE_INVALID_DESCRIPTION = "Description cannot contain any commas (,)!";
     public static final String MESSAGE_INVALID_ID = "Please enter a valid numerical index!";
-    public static final String MESSAGE_INVALID_PRICE = "Please enter a valid price!";
+    public static final String MESSAGE_INVALID_PRICE = "Price must be a numeric or decimal value!";
+    public static final String MESSAGE_NON_POSITIVE_PRICE = "Price must be greater than zero!";
     public static final String MESSAGE_INVALID_PRICE_RANGE = "Please specify a valid price range!";
+
+    public static final String MESSAGE_DUPLICATE_OPTION = "Please ensure that every option is only declared once!";
+    public static final String MESSAGE_UNKNOWN_OPTION = "Unknown option used: ";
     public static final String MESSAGE_MISSING_ARGS_ADD = "Please specify the description, category and price!";
-    public static final String MESSAGE_MISSING_PRICE_ADD = "Please specify the price using the '-p' flag!";
-    public static final String MESSAGE_MISSING_DESCRIPTION_ADD = "Please specify the description using the '-d' flag!";
-    public static final String MESSAGE_MISSING_CATEGORY_ADD = "Please specify the category using the '-c' flag!";
+    public static final String MESSAGE_MISSING_PRICE_ADD = "Please specify the price using the '-p' option!";
+    public static final String MESSAGE_MISSING_DESCRIPTION_ADD = "Please specify the description using the '-d' option!";
+    public static final String MESSAGE_MISSING_CATEGORY_ADD = "Please specify the category using the '-c' option!";
     public static final String MESSAGE_MISSING_ARGS_EDIT = "Please specify the ID of the expense you would like to " +
             "edit!";
     public static final String MESSAGE_INVALID_DATE = "Please enter date in dd/MM/yy format" +
