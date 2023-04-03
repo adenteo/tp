@@ -26,7 +26,7 @@ public class ViewCommand extends Command {
     private final Double priceToViewMax;
 
     public ViewCommand(int numberOfEntriesToView) {
-        this(numberOfEntriesToView, null, 0.0 , Double.MAX_VALUE, "", "");
+        this(numberOfEntriesToView, null, null, Double.MAX_VALUE, null, null);
     }
 
     public ViewCommand(int numberOfEntriesToView,
@@ -58,14 +58,16 @@ public class ViewCommand extends Command {
         if (numberOfEntriesToView <= 0) {
             throw new InvalidArgumentsException(MessageConstants.MESSAGE_INVALID_NUMBER_OF_ENTRIES);
         }
-        if (!startDateString.isEmpty() && !endDateString.isEmpty()){
+        if (startDateString != null && endDateString != null) {
             request.addParam(RequestParams.FILTER_BY_TIME_START, startDateString);
             request.addParam(RequestParams.FILTER_BY_TIME_END, endDateString);
         }
-
-        request.addParam(RequestParams.FILTER_BY_AMOUNT_START, String.valueOf(priceToViewMin));
-        request.addParam(RequestParams.FILTER_BY_AMOUNT_END, String.valueOf(priceToViewMax));
-
+        if (priceToViewMin != null) {
+            request.addParam(RequestParams.FILTER_BY_AMOUNT_START, String.valueOf(priceToViewMin));
+        }
+        if (priceToViewMax != null) {
+            request.addParam(RequestParams.FILTER_BY_AMOUNT_END, String.valueOf(priceToViewMax));
+        }
         Response response = backend.requestEndpointEntries(request);
         EntryLog relevantEntries = EntryLogParser.deserialise(response.getData());
         if (response.getResponseStatus() == ResponseStatus.UNPROCESSABLE_CONTENT) {

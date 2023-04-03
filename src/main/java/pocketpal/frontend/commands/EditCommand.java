@@ -40,13 +40,13 @@ public class EditCommand extends Command {
     @Override
     public void execute(UI ui, Backend backend) throws InvalidArgumentsException, InvalidCategoryException {
         final Request request = new Request(RequestMethod.PATCH, String.valueOf(expenseId));
-        if (!newPrice.isEmpty()) {
+        if (newPrice != null) {
             request.addParam(RequestParams.EDIT_AMOUNT, newPrice);
         }
-        if (!newDescription.isEmpty()) {
+        if (newDescription != null) {
             request.addParam(RequestParams.EDIT_DESCRIPTION, newDescription);
         }
-        if (!newCategory.isEmpty()) {
+        if (newCategory != null) {
             request.addParam(RequestParams.EDIT_CATEGORY, StringUtil.toTitleCase(newCategory));
         }
 
@@ -70,10 +70,10 @@ public class EditCommand extends Command {
      */
     public String[] getAttributes() {
         return new String[]{
-            Integer.toString(this.expenseId),
-            this.newCategory,
-            this.newDescription,
-            this.newPrice
+                Integer.toString(this.expenseId),
+                this.newCategory,
+                this.newDescription,
+                this.newPrice
         };
     }
 }

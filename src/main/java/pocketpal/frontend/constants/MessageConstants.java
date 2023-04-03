@@ -52,7 +52,8 @@ public final class MessageConstants {
     public static final String MESSAGE_NON_POSITIVE_PRICE = "Price must be greater than zero!";
     public static final String MESSAGE_INVALID_PRICE_RANGE = "Please specify a valid price range!";
 
-    public static final String MESSAGE_DUPLICATE_OPTION = "Please ensure that every option is only declared once!";
+    public static final String MESSAGE_DUPLICATE_OPTION = "Please ensure that any option is not declared more than " +
+            "once!";
     public static final String MESSAGE_UNKNOWN_OPTION = "Unknown option used: ";
     public static final String MESSAGE_MISSING_ARGS_ADD = "Please specify the description, category and price!";
     public static final String MESSAGE_MISSING_PRICE_ADD = "Please specify the price using the '-p' option!";

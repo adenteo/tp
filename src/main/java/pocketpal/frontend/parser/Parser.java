@@ -53,7 +53,9 @@ public class Parser {
     private static final String endpriceOption = "-ep|-endprice";
     private static final String availableOptions =
             categoryOption + "|" + priceOption + "|" + descriptionOption + "|" + startdateOption + "|" + enddateOption + "|" + startpriceOption + "|" + endpriceOption;
-
+    private static final String availableOptionsAddEdit = categoryOption + "|" + priceOption + "|" + descriptionOption;
+    private static final String availableOptionsView =
+            categoryOption + "|" + startpriceOption + "|" + endpriceOption + "|" + startdateOption + "|" + enddateOption;
 
     /**
      * Returns a Command object that is to be executed by the backend. If any input
@@ -83,9 +85,10 @@ public class Parser {
         String[] userInputArray = userInput.split(" ", 2);
         assert userInputArray.length >= 1 : "Input must contain at least one command";
         String command = userInputArray[0].toLowerCase();
-        String arguments = userInput.replaceFirst(command, "").trim();
-        if (!arguments.isEmpty()) {
-            checkUnknownFlag(arguments);
+        String arguments = "";
+        if (userInputArray.length > 1) {
+            arguments = userInputArray[1];
+            checkUnknownOption(arguments, availableOptions);
         }
         logger.log(Level.INFO, "User input command: " + command);
         logger.log(Level.INFO, "User input arguments: " + arguments);
@@ -164,12 +167,13 @@ public class Parser {
      * @throws InvalidCategoryException  If category entered is invalid.
      */
     private Command parseAddCommand(String arguments)
-            throws MissingArgumentsException, InvalidArgumentsException, InvalidCategoryException, DuplicateOptionException {
+            throws MissingArgumentsException, InvalidArgumentsException, InvalidCategoryException, DuplicateOptionException, UnknownOptionException {
         logger.entering(Parser.class.getName(), "parseAddCommand()");
         logger.info("Parsing add command with arguments: " + arguments);
         if (arguments.isEmpty()) {
             throw new MissingArgumentsException(MessageConstants.MESSAGE_MISSING_ARGS_ADD);
         }
+        checkUnknownOption(arguments, availableOptionsAddEdit);
         checkDuplicateOptionsAddEdit(arguments);
         String[] argumentsArray = parseAddArguments(arguments);
         assert argumentsArray.length == 3 : "User input must contain description, category, and price";
@@ -299,13 +303,14 @@ public class Parser {
      * @throws MissingArgumentsException If required arguments are missing.
      * @throws InvalidArgumentsException If entered arguments are in incorrect format.
      */
-    private Command parseEditCommand(String arguments) throws MissingArgumentsException, InvalidArgumentsException, DuplicateOptionException {
+    private Command parseEditCommand(String arguments) throws MissingArgumentsException, InvalidArgumentsException, DuplicateOptionException, UnknownOptionException {
         logger.entering(Parser.class.getName(), "parseEditCommand()");
         logger.info("Parsing arguments for edit command: " + arguments);
         if (arguments.isEmpty()) {
             logger.warning("Missing arguments for edit command: " + MessageConstants.MESSAGE_MISSING_ARGS_EDIT);
             throw new MissingArgumentsException(MessageConstants.MESSAGE_MISSING_ARGS_EDIT);
         }
+        checkUnknownOption(arguments, availableOptionsAddEdit);
         checkDuplicateOptionsAddEdit(arguments);
         String[] argumentsArray = parseEditArguments(arguments);
         String expenseId = argumentsArray[0];
@@ -357,13 +362,15 @@ public class Parser {
      * @throws MissingDateException      If required end/start date is not specified.
      */
     private Command parseViewCommand(String arguments) throws InvalidArgumentsException, InvalidCategoryException,
-            InvalidDateException, MissingDateException {
+            InvalidDateException, MissingDateException, UnknownOptionException, DuplicateOptionException {
         logger.entering(Parser.class.getName(), "parseViewCommand()");
         logger.info("Parsing view command with arguments: " + arguments);
         if (arguments.isEmpty()) {
             logger.info("No count specified. Listing all expenses");
             return new ViewCommand(Integer.MAX_VALUE);
         }
+        checkDuplicateOptionsView(arguments);
+        checkUnknownOption(arguments, availableOptionsView);
         String[] argumentsArray = arguments.split(" ");
         assert argumentsArray.length >= 1 : "User input must contain at least 1 argument";
         Category category = null;
@@ -559,11 +566,11 @@ public class Parser {
         }
     }
 
-    private void checkUnknownFlag(String input) throws UnknownOptionException {
+    private void checkUnknownOption(String input, String options) throws UnknownOptionException {
         String[] arguments = input.split("\\s+");
         for (String argument : arguments) {
             char firstCharacter = argument.charAt(0);
-            if (firstCharacter == '-' && !argument.matches(availableOptions)) { //option not recognised
+            if (firstCharacter == '-' && !argument.matches(options)) { //option not recognised
                 throw new UnknownOptionException(MessageConstants.MESSAGE_UNKNOWN_OPTION + argument);
             }
         }
