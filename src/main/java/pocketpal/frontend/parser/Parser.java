@@ -33,16 +33,6 @@ public class Parser {
     private static final String PRICE_FLAG = "-p ";
     private static final Logger logger = Logger.getLogger(Parser.class.getName());
     private static final String VALID_PRICE_REGEX = "[0-9.-]*";
-    private static final Pattern DESCRIPTION_PATTERN = Pattern.compile("(-d|-description)\\s+(.*?)" +
-            "(\\s+-c|-p|-category|-price|$)");
-    private static final Pattern CATEGORY_PATTERN = Pattern.compile("(-c|-category)\\s+(\\S+)");
-    private static final Pattern PRICE_PATTERN = Pattern.compile("(-p|-price)\\s+(\\S+)");
-    private static final Pattern START_PRICE_PATTERN = Pattern.compile("(-sp|-startprice)\\s+(\\S+)");
-    private static final Pattern END_PRICE_PATTERN = Pattern.compile("(-ep|-endprice)\\s+(\\S+)");
-    private static final Pattern ID_PATTERN = Pattern.compile("(\\s+)?(\\S+)");
-    private static final Pattern START_DATE_PATTERN = Pattern.compile("(-sd|-startdate)\\s+(0*\\d+/0*\\d+/\\d{2,})");
-    private static final Pattern END_DATE_PATTERN = Pattern.compile("(-ed|-enddate)\\s+(0*\\d+/0*\\d+/\\d{2,})");
-
     private static final String categoryOption = "-c|-category";
     private static final String priceOption = "-p|-price";
     private static final String descriptionOption = "-d|-description";
@@ -56,6 +46,16 @@ public class Parser {
     private static final String availableOptionsAddEdit = categoryOption + "|" + priceOption + "|" + descriptionOption;
     private static final String availableOptionsView =
             categoryOption + "|" + startpriceOption + "|" + endpriceOption + "|" + startdateOption + "|" + enddateOption;
+
+    private static final Pattern DESCRIPTION_PATTERN = Pattern.compile("(-d|-description)(\\s+(.*?))?" +
+            "(\\s+$" + availableOptions + ")");
+    private static final Pattern CATEGORY_PATTERN = Pattern.compile("(-c|-category)(\\s+\\S+)?");
+    private static final Pattern PRICE_PATTERN = Pattern.compile("(-p|-price)(\\s+\\S+)?");
+    private static final Pattern START_PRICE_PATTERN = Pattern.compile("(-sp|-startprice)(\\s+\\S+)?");
+    private static final Pattern END_PRICE_PATTERN = Pattern.compile("(-ep|-endprice)(\\s+(\\S+))?");
+    private static final Pattern ID_PATTERN = Pattern.compile("(\\s+)?(\\S+)");
+    private static final Pattern START_DATE_PATTERN = Pattern.compile("(-sd|-startdate)\\s+(0*\\d+/0*\\d+/\\d{2,})");
+    private static final Pattern END_DATE_PATTERN = Pattern.compile("(-ed|-enddate)\\s+(0*\\d+/0*\\d+/\\d{2,})");
 
     /**
      * Returns a Command object that is to be executed by the backend. If any input
@@ -272,7 +272,7 @@ public class Parser {
      * @param arguments User input after the edit command.
      * @return String[] Array containing new expenseId, description, category and price
      */
-    private String[] parseEditArguments(String arguments) {
+    private String[] parseEditArguments(String arguments) throws MissingArgumentsException {
         logger.entering(Parser.class.getName(), "parseEditArguments()");
         String expenseId;
         String description;
@@ -362,7 +362,7 @@ public class Parser {
      * @throws MissingDateException      If required end/start date is not specified.
      */
     private Command parseViewCommand(String arguments) throws InvalidArgumentsException, InvalidCategoryException,
-            InvalidDateException, MissingDateException, UnknownOptionException, DuplicateOptionException {
+            InvalidDateException, MissingDateException, UnknownOptionException, DuplicateOptionException, MissingArgumentsException {
         logger.entering(Parser.class.getName(), "parseViewCommand()");
         logger.info("Parsing view command with arguments: " + arguments);
         if (arguments.isEmpty()) {
@@ -403,7 +403,7 @@ public class Parser {
      * @throws InvalidArgumentsException If count specified is not a positive
      *                                   integer.
      */
-    private Integer extractViewCount(String arguments) throws InvalidArgumentsException {
+    private Integer extractViewCount(String arguments) throws InvalidArgumentsException, MissingArgumentsException {
         String viewCount = extractDetail(arguments, ID_PATTERN); //detail extracted is either view count or an
         // optional flag indicated by user
         if (viewCount.matches("-sd|-sp|-ep|-c|-startdate|-enddate|-category|-startprice|-endprice")) {
@@ -436,7 +436,7 @@ public class Parser {
      * @throws InvalidArgumentsException If price specified is not in numerical form
      *                                   or if range specified is invalid.
      */
-    private Double[] extractPrices(String arguments) throws InvalidArgumentsException {
+    private Double[] extractPrices(String arguments) throws InvalidArgumentsException, MissingArgumentsException {
         Double[] prices = new Double[2];
         String priceMinStr = extractDetail(arguments, START_PRICE_PATTERN);
         arguments = arguments.replaceFirst(PRICE_FLAG + priceMinStr, ""); //Remove starting price from string
@@ -473,7 +473,7 @@ public class Parser {
      * @throws InvalidDateException If date specified does not exist.
      * @throws MissingDateException If either start or end date is not specified.
      */
-    private String[] extractDates(String arguments) throws InvalidDateException, MissingDateException {
+    private String[] extractDates(String arguments) throws InvalidDateException, MissingDateException, MissingArgumentsException {
         String[] dates = new String[2];
         String startDateString = extractDetail(arguments, START_DATE_PATTERN);
         String endDateString = extractDetail(arguments, END_DATE_PATTERN);
@@ -507,12 +507,16 @@ public class Parser {
      * @param detail The Pattern that is to be matched by the user input.
      * @return String The matched string.
      */
-    private String extractDetail(String string, Pattern detail) {
+    private String extractDetail(String string, Pattern detail) throws MissingArgumentsException {
         String detailToExtract;
         Matcher matcher = detail.matcher(string);
-        if (matcher.find()) {
-            detailToExtract = matcher.group(2).trim();
-            return detailToExtract;
+        if (matcher.find()) { //option was used
+            String option = matcher.group(1);
+            detailToExtract = matcher.group(2);
+            if (detailToExtract == null || detailToExtract.trim().isEmpty()) { //missing argument for option used
+                throw new MissingArgumentsException(MessageConstants.MESSAGE_MISSING_ARGUMENT + option);
+            }
+            return detailToExtract.trim();
         }
         return null;
     }

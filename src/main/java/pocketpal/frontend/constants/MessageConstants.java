@@ -44,17 +44,18 @@ public final class MessageConstants {
 
     // Exception Messages
     public static final String MESSAGE_EMPTY_INPUT = "Use /help for a list of supported commands!";
-    public static final String MESSAGE_INVALID_COMMAND = "Please enter a valid command!";
+    public static final String MESSAGE_INVALID_COMMAND = "Please specify a valid command!";
     public static final String MESSAGE_INVALID_CATEGORY = "Please specify a valid category!";
     public static final String MESSAGE_INVALID_DESCRIPTION = "Description cannot contain any commas (,)!";
-    public static final String MESSAGE_INVALID_ID = "Please enter a valid numerical index!";
-    public static final String MESSAGE_INVALID_PRICE = "Price must be a numeric or decimal value!";
+    public static final String MESSAGE_INVALID_ID = "Please specify a valid numerical index!";
+    public static final String MESSAGE_INVALID_PRICE = "Please specify a numeric or decimal value for the price!";
     public static final String MESSAGE_NON_POSITIVE_PRICE = "Price must be greater than zero!";
     public static final String MESSAGE_INVALID_PRICE_RANGE = "Please specify a valid price range!";
 
     public static final String MESSAGE_DUPLICATE_OPTION = "Please ensure that any option is not declared more than " +
             "once!";
     public static final String MESSAGE_UNKNOWN_OPTION = "Unknown option used: ";
+    public static final String MESSAGE_MISSING_ARGUMENT = "Missing argument for option: ";
     public static final String MESSAGE_MISSING_ARGS_ADD = "Please specify the description, category and price!";
     public static final String MESSAGE_MISSING_PRICE_ADD = "Please specify the price using the '-p' option!";
     public static final String MESSAGE_MISSING_DESCRIPTION_ADD = "Please specify the description using the '-d' option!";
