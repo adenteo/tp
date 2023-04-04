@@ -47,13 +47,13 @@ public class Parser {
     private static final String availableOptionsView =
             categoryOption + "|" + startpriceOption + "|" + endpriceOption + "|" + startdateOption + "|" + enddateOption;
 
-    private static final Pattern DESCRIPTION_PATTERN = Pattern.compile("(-d|-description)(\\s+(.*?))?" +
-            "(\\s+$" + availableOptions + ")");
-    private static final Pattern CATEGORY_PATTERN = Pattern.compile("(-c|-category)(\\s+\\S+)?");
-    private static final Pattern PRICE_PATTERN = Pattern.compile("(-p|-price)(\\s+\\S+)?");
-    private static final Pattern START_PRICE_PATTERN = Pattern.compile("(-sp|-startprice)(\\s+\\S+)?");
-    private static final Pattern END_PRICE_PATTERN = Pattern.compile("(-ep|-endprice)(\\s+(\\S+))?");
-    private static final Pattern ID_PATTERN = Pattern.compile("(\\s+)?(\\S+)");
+    private static final Pattern DESCRIPTION_PATTERN = Pattern.compile("(-d|-description)\\s+(.*?)" +
+            "(\\s+-|\\r?$)");
+    private static final Pattern CATEGORY_PATTERN = Pattern.compile("(-c|-category)(\\s+\\S+)?(\\s+-|\\r?$)");
+    private static final Pattern PRICE_PATTERN = Pattern.compile("(-p|-price)(\\s+\\S+)?(\\s+-|\\r?$)");
+    private static final Pattern START_PRICE_PATTERN = Pattern.compile("(-sp|-startprice)(\\s+\\S+)?(\\s+-|\\r?$)");
+    private static final Pattern END_PRICE_PATTERN = Pattern.compile("(-ep|-endprice)(\\s+(\\S+))?(\\s+-|\\r?$)");
+    private static final Pattern ID_PATTERN = Pattern.compile("(\\s+)?(.*?)(\\s+-|\\r?$)");
     private static final Pattern START_DATE_PATTERN = Pattern.compile("(-sd|-startdate)\\s+(0*\\d+/0*\\d+/\\d{2,})");
     private static final Pattern END_DATE_PATTERN = Pattern.compile("(-ed|-enddate)\\s+(0*\\d+/0*\\d+/\\d{2,})");
 
@@ -404,8 +404,8 @@ public class Parser {
      *                                   integer.
      */
     private Integer extractViewCount(String arguments) throws InvalidArgumentsException, MissingArgumentsException {
-        String viewCount = extractDetail(arguments, ID_PATTERN); //detail extracted is either view count or an
-        // optional flag indicated by user
+        String viewCount = extractDetail(arguments, ID_PATTERN).split(" ")[0]; //detail extracted is either view
+        // count or an optional flag indicated by user
         if (viewCount.matches("-sd|-sp|-ep|-c|-startdate|-enddate|-category|-startprice|-endprice")) {
             //count is not specified
             viewCount = Integer.toString(Integer.MAX_VALUE);
@@ -476,7 +476,9 @@ public class Parser {
     private String[] extractDates(String arguments) throws InvalidDateException, MissingDateException, MissingArgumentsException {
         String[] dates = new String[2];
         String startDateString = extractDetail(arguments, START_DATE_PATTERN);
+        System.out.println("start date: " + startDateString);
         String endDateString = extractDetail(arguments, END_DATE_PATTERN);
+        System.out.println("end date: " + endDateString);
         if (startDateString != null) {
             logger.info("start date identified as: " + startDateString);
             isValidDate(startDateString);
@@ -513,11 +515,15 @@ public class Parser {
         if (matcher.find()) { //option was used
             String option = matcher.group(1);
             detailToExtract = matcher.group(2);
-            if (detailToExtract == null || detailToExtract.trim().isEmpty()) { //missing argument for option used
+            if (detailToExtract == null || detailToExtract.trim().isEmpty() || detailToExtract.trim().charAt(0) == '-' && detail != ID_PATTERN) {
+                //missing
+                // argument
+                // for option used
                 throw new MissingArgumentsException(MessageConstants.MESSAGE_MISSING_ARGUMENT + option);
             }
             return detailToExtract.trim();
         }
+//        System.out.println("no matches");
         return null;
     }
 
